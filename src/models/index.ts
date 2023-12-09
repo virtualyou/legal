@@ -18,9 +18,9 @@
  *
  */
 
-const config = require("../config/db.config.js");
+import { Sequelize } from 'sequelize';
+import config from '../config/db.config';
 
-const Sequelize = require("sequelize");
 const sequelize = new Sequelize(
     config.DB,
     config.USER,
@@ -37,11 +37,17 @@ const sequelize = new Sequelize(
     }
 );
 
-const db = {};
+interface DB {
+    Sequelize: typeof Sequelize;
+    sequelize: Sequelize;
+    doc: any;
+}
 
-db.Sequelize = Sequelize;
-db.sequelize = sequelize;
+const db: DB = {
+    Sequelize,
+    sequelize,
+    doc: require('./doc.model.ts')(sequelize, Sequelize),
+};
 
-db.peep = require("./peep.model.js")(sequelize, Sequelize);
+export default db;
 
-module.exports = db;

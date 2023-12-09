@@ -19,7 +19,7 @@
  */
 
 const jwt = require("jsonwebtoken");
-const config = require("../config/auth.config.js");
+const config = require("../config/auth.config.ts");
 
 require('dotenv').config();
 const USERAUTH_SERVER_PORT_URL = process.env.USERAUTH_SERVER_PORT_URL;

@@ -19,23 +19,14 @@
  */
 
 module.exports = (sequelize, Sequelize) => {
-    return sequelize.define("peeps", {
+    return sequelize.define("docs", {
         name: {
             type: Sequelize.STRING
         },
-        phone1: {
+        type: {
             type: Sequelize.STRING
         },
-        phone2: {
-            type: Sequelize.STRING
-        },
-        email: {
-            type: Sequelize.STRING
-        },
-        address: {
-            type: Sequelize.STRING
-        },
-        note: {
+        link: {
             type: Sequelize.STRING
         },
         userKey: {
@@ -43,12 +34,3 @@ module.exports = (sequelize, Sequelize) => {
         }
     });
 };
-/*
-    "name": "Bob Taylor",
-    "email": "btaylor79@gmail.com",
-    "phone1": "919-567-5499",
-    "phone2": "456-122-8000",
-    "address": "7823 Waters Lane, Miami, Florida, 23499",
-    "note": "Close friend",
-    "userKey": 10
- */
