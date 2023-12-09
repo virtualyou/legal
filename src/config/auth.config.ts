@@ -18,6 +18,8 @@
  *
  */
 
-module.exports = {
+const cookieConfig = {
   secret: "virtual-you-secret"
 };
+
+export default cookieConfig;

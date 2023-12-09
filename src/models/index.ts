@@ -1,4 +1,3 @@
-
 /*
  *
  * VirtualYou Project
@@ -16,38 +15,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
+ * index.ts
  */
 
 import { Sequelize } from 'sequelize';
-import config from '../config/db.config';
+import config from '../config/config';
+import doc from './doc.model.js';
 
 const sequelize = new Sequelize(
-    config.DB,
-    config.USER,
-    config.PASSWORD,
+    config.database.db,
+    config.database.user,
+    config.database.password,
     {
-        host: config.HOST,
-        dialect: config.dialect,
+        host: config.database.host,
+        dialect: config.database.dialect,
         pool: {
-            max: config.pool.max,
-            min: config.pool.min,
-            acquire: config.pool.acquire,
-            idle: config.pool.idle
+            max: config.database.pool.max,
+            min: config.database.pool.min,
+            acquire: config.database.pool.acquire,
+            idle: config.database.pool.idle
         }
     }
 );
 
-interface DB {
-    Sequelize: typeof Sequelize;
-    sequelize: Sequelize;
-    doc: any;
-}
+let db: any;
+db = {};
 
-const db: DB = {
-    Sequelize,
-    sequelize,
-    doc: require('./doc.model.ts')(sequelize, Sequelize),
-};
+db['sequelize'] = sequelize
+db['Sequelize'] = Sequelize
+
+// @ts-ignore
+db.doc = doc (sequelize, Sequelize);
 
 export default db;
 

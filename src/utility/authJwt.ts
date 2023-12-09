@@ -17,14 +17,36 @@
  * limitations under the License.
  *
  */
+//import * as dotenv from 'dotenv';
 
-const jwt = require("jsonwebtoken");
-const config = require("../config/auth.config.ts");
+import jwt from 'jsonwebtoken';
+import cookieConfig from '../config/auth.config';
+import logger from "../middleware/logger";
+import {Request} from "express";
 
-require('dotenv').config();
-const USERAUTH_SERVER_PORT_URL = process.env.USERAUTH_SERVER_PORT_URL;
+const USERAUTH_SERVER_PORT_URL = process.env['USERAUTH_SERVER_PORT_URL'];
 
-verifyToken = (req, res, next) => {
+//declare namespace Express {
+/*
+  interface Request {
+    userId: string,
+    ownerId: string,
+    session: {
+      token: string,
+    }
+  }
+ */
+  //export interface Response {
+    //customProperty: string;
+  //}
+//}
+const testMethod = () => {
+  logger.log('info', 'We did get in test method.');
+}
+const verifyToken = (req: Request, res: any, next: any) => {
+  logger.log('info', 'checking for a token');
+
+  // @ts-ignore
   let token = req.session.token;
 
   if (!token) {
@@ -34,25 +56,32 @@ verifyToken = (req, res, next) => {
     });
   }
 
+  logger.log('info', 'we have a token');
+
   jwt.verify(token,
-      config.secret,
-      (err, decoded) => {
+      cookieConfig.secret,
+      (err: any, decoded: any) => {
         if (err) {
           console.log("JWT did not verify!");
           return res.status(401).send({
             message: "Unauthorized!",
           });
         }
+        // @ts-ignore
         req.userId = decoded.id;
+        // @ts-ignore
         req.ownerId = decoded.owner;
-        console.log("The owner id is: " + req.ownerId);
-        console.log("The JWT token has been verified. We have authentication.");
+        // @ts-ignore
+        logger.log('info', 'the owner id is: ' + req.ownerId);
+        logger.log('info', 'The JWT token has been verified. We have authentication.');
+        //console.log("The owner id is: " + req.ownerId);
+        //console.log("The JWT token has been verified. We have authentication.");
         next();
       });
 };
 
 // TODO -> refactor into one method to reduce code duplication
-isAdmin = async (req, res, next) => {
+const isAdmin = async (req: any, res: any, next: any) => {
   try {
     const userid = req.userId;
     const cookieHeader = req.headers.cookie;
@@ -75,7 +104,7 @@ isAdmin = async (req, res, next) => {
   }
 };
 
-isOwner = async (req, res, next) => {
+const isOwner = async (req: any, res: any, next: any) => {
   try {
     const userid = req.userId;
     const cookieHeader = req.headers.cookie;
@@ -98,7 +127,7 @@ isOwner = async (req, res, next) => {
   }
 };
 
-isOwnerOrAgent = async (req, res, next) => {
+const isOwnerOrAgent = async (req: any, res: any, next: any) => {
   try {
     const userid = req.userId;
     const cookieHeader = req.headers.cookie;
@@ -121,7 +150,7 @@ isOwnerOrAgent = async (req, res, next) => {
   }
 };
 
-isOwnerOrAgentOrMonitor = async (req, res, next) => {
+const isOwnerOrAgentOrMonitor = async (req: any, res: any, next: any) => {
   try {
     const userid = req.userId;
     const cookieHeader = req.headers.cookie;
@@ -144,7 +173,7 @@ isOwnerOrAgentOrMonitor = async (req, res, next) => {
   }
 };
 
-isAgent = async (req, res, next) => {
+const isAgent = async (req: any, res: any, next: any) => {
   try {
     const userid = req.userId;
     const cookieHeader = req.headers.cookie;
@@ -167,7 +196,8 @@ isAgent = async (req, res, next) => {
   }
 };
 
-isMonitor = async (req, res, next) => {
+
+const isMonitor = async (req: any, res: any, next: any) => {
   try {
     const userid = req.userId;
     const cookieHeader = req.headers.cookie;
@@ -191,7 +221,7 @@ isMonitor = async (req, res, next) => {
 };
 
 // Fetch all User Roles (Private)
-async function fetchData(id, cookie) {
+async function fetchData(id: any, cookie: any) {
   try {
     const response = await fetch(USERAUTH_SERVER_PORT_URL + '/userauth/v1/users/' + id + '/roles', {
       headers: {
@@ -215,5 +245,6 @@ const authJwt = {
   isOwnerOrAgentOrMonitor,
   isAgent,
   isMonitor,
+  testMethod
 };
-module.exports = authJwt;
+export default authJwt;

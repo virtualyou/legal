@@ -1,4 +1,3 @@
-
 /*
  *
  * VirtualYou Project
@@ -16,9 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
+ * doc.model.ts
  */
 
-module.exports = (sequelize, Sequelize) => {
+//module.exports = (sequelize: {
+const doc = (sequelize: {
+    define: (arg0: string, arg1: {
+        name: { type: any; };
+        type: { type: any; };
+        link: { type: any; };
+        userKey: { type: any; };
+    }) => any;
+}, Sequelize: { STRING: any; INTEGER: any; }) => {
     return sequelize.define("docs", {
         name: {
             type: Sequelize.STRING
@@ -34,3 +42,5 @@ module.exports = (sequelize, Sequelize) => {
         }
     });
 };
+
+export default doc;
