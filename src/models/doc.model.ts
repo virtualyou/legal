@@ -18,15 +18,7 @@
  * doc.model.ts
  */
 
-//module.exports = (sequelize: {
-const doc = (sequelize: {
-    define: (arg0: string, arg1: {
-        name: { type: any; };
-        type: { type: any; };
-        link: { type: any; };
-        userKey: { type: any; };
-    }) => any;
-}, Sequelize: { STRING: any; INTEGER: any; }) => {
+const doc = (sequelize: any, Sequelize: any) => {
     return sequelize.define("docs", {
         name: {
             type: Sequelize.STRING

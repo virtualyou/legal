@@ -18,34 +18,32 @@
  * index.ts
  */
 
-import { Sequelize } from 'sequelize';
-import config from '../config/config';
-import doc from './doc.model.js';
+import config from "../config/config";
+import { Sequelize } from "sequelize-typescript";
+import Doc from "./doc.model";
 
 const sequelize = new Sequelize(
     config.database.db,
     config.database.user,
     config.database.password,
     {
+        logging: false,
         host: config.database.host,
         dialect: config.database.dialect,
         pool: {
             max: config.database.pool.max,
             min: config.database.pool.min,
             acquire: config.database.pool.acquire,
-            idle: config.database.pool.idle
-        }
+            idle: config.database.pool.idle,
+        },
     }
 );
 
-let db: any;
-db = {};
+const db: any = {};
 
-db['sequelize'] = sequelize
-db['Sequelize'] = Sequelize
+db["sequelize"] = sequelize;
+db["Sequelize"] = Sequelize;
 
-// @ts-ignore
-db.doc = doc (sequelize, Sequelize);
+db.doc = Doc(sequelize, Sequelize);
 
 export default db;
-

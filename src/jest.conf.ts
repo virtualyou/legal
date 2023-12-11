@@ -1,4 +1,3 @@
-
 /*
  *
  * VirtualYou Project
@@ -18,8 +17,7 @@
  *
  */
 
-import authJwt from "./authJwt";
-
 module.exports = {
-  authJwt,
+  // jest configuration options
+  globalTeardown: "./models/teardown.ts",
 };

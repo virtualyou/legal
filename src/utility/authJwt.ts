@@ -22,28 +22,11 @@
 import jwt from 'jsonwebtoken';
 import cookieConfig from '../config/auth.config';
 import logger from "../middleware/logger";
-import {Request} from "express";
+import { Request, Response, NextFunction } from "express";
 
 const USERAUTH_SERVER_PORT_URL = process.env['USERAUTH_SERVER_PORT_URL'];
 
-//declare namespace Express {
-/*
-  interface Request {
-    userId: string,
-    ownerId: string,
-    session: {
-      token: string,
-    }
-  }
- */
-  //export interface Response {
-    //customProperty: string;
-  //}
-//}
-const testMethod = () => {
-  logger.log('info', 'We did get in test method.');
-}
-const verifyToken = (req: Request, res: any, next: any) => {
+const verifyToken = (req: Request, res: Response, next: NextFunction) => {
   logger.log('info', 'checking for a token');
 
   // @ts-ignore
@@ -81,7 +64,7 @@ const verifyToken = (req: Request, res: any, next: any) => {
 };
 
 // TODO -> refactor into one method to reduce code duplication
-const isAdmin = async (req: any, res: any, next: any) => {
+const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userid = req.userId;
     const cookieHeader = req.headers.cookie;
@@ -104,7 +87,7 @@ const isAdmin = async (req: any, res: any, next: any) => {
   }
 };
 
-const isOwner = async (req: any, res: any, next: any) => {
+const isOwner = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userid = req.userId;
     const cookieHeader = req.headers.cookie;
@@ -127,7 +110,7 @@ const isOwner = async (req: any, res: any, next: any) => {
   }
 };
 
-const isOwnerOrAgent = async (req: any, res: any, next: any) => {
+const isOwnerOrAgent = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userid = req.userId;
     const cookieHeader = req.headers.cookie;
@@ -150,7 +133,7 @@ const isOwnerOrAgent = async (req: any, res: any, next: any) => {
   }
 };
 
-const isOwnerOrAgentOrMonitor = async (req: any, res: any, next: any) => {
+const isOwnerOrAgentOrMonitor = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userid = req.userId;
     const cookieHeader = req.headers.cookie;
@@ -173,7 +156,7 @@ const isOwnerOrAgentOrMonitor = async (req: any, res: any, next: any) => {
   }
 };
 
-const isAgent = async (req: any, res: any, next: any) => {
+const isAgent = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userid = req.userId;
     const cookieHeader = req.headers.cookie;
@@ -197,7 +180,7 @@ const isAgent = async (req: any, res: any, next: any) => {
 };
 
 
-const isMonitor = async (req: any, res: any, next: any) => {
+const isMonitor = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userid = req.userId;
     const cookieHeader = req.headers.cookie;
@@ -245,6 +228,5 @@ const authJwt = {
   isOwnerOrAgentOrMonitor,
   isAgent,
   isMonitor,
-  testMethod
 };
 export default authJwt;

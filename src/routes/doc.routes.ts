@@ -1,4 +1,3 @@
-
 /*
  *
  * VirtualYou Project
@@ -16,10 +15,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
+ * doc.routes.ts
  */
 
-import authJwt from "./authJwt";
+import { NextFunction, Request, Response } from "express";
+import docController from "../controllers/doc.controller";
+import authJwt from '../utility/authJwt';
+import express from 'express';
 
-module.exports = {
-  authJwt,
-};
+const docRouter = express();
+
+docRouter.use((_req: Request, res: Response, next: NextFunction) => {
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Origin, Content-Type, Accept"
+    );
+    next();
+});
+
+docRouter.get(
+    "/legal/v1/owner/docs",
+    [authJwt.verifyToken, authJwt.isOwnerOrAgentOrMonitor],
+    docController.getAllDocsForOwner
+);
+
+export default docRouter;

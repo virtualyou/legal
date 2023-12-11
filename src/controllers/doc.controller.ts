@@ -418,7 +418,7 @@ const deleteAllDocsForOwner = (req: any, res: Response) => {
         });
 }
 
-const controller = {
+const docController = {
     getAllDocs,
     getAllDocsForOwner,
     getDoc,
@@ -432,5 +432,5 @@ const controller = {
     deleteAllDocsForOwner
     
 };
-export default controller;
+export default docController;
 
