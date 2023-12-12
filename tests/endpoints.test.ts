@@ -22,29 +22,8 @@ import request from "supertest";
 import app from "../src/app";
 
 describe("Test get all owner docs", () => {
-//  let cookie: string[] = [];
   const agent = request.agent(app);
-/*
-  beforeAll(async () => {
-    const response = await agent.post("http://localhost:3001/userauth/v1/auth/signin").send({
-      username: "owner",
-      password: "abc123",
-    });
-    cookie = response.get("Set-Cookie");
-  });
-*/
-/*
-  afterAll(async () => {
-    await request.agent("http://localhost:3001/userauth/v1/auth/signout").send({
-      username: "owner",
-      password: "abc123",
-    });
-  });
-*/
   it("GET /legal/v1/owner/docs", async () => {
-//    expect(cookie).toBeTruthy();
-//    console.log("cookie: " + cookie);
-
     const response2 = await agent.get("/legal/v1/owner/docs"); //.set(cookie);
     expect(response2.statusCode).toBe(403);
     expect(response2.type).toBe("application/json");
