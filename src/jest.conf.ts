@@ -20,4 +20,6 @@
 module.exports = {
   // jest configuration options
   globalTeardown: "./models/teardown.ts",
+  //testEnvironment: "jsdom",
+  //setupFilesAfterEnv: ['./testscript.ts'],
 };

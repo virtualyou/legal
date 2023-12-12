@@ -18,7 +18,7 @@
  * app.ts
  */
 
-import express, { type Express } from "express";
+import express, {type Express} from "express";
 import cors from "cors";
 import * as dotenv from "dotenv";
 import db from "./models/index";
@@ -35,7 +35,7 @@ dotenv.config();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({extended: true}));
 
 
 app.use(
@@ -47,8 +47,8 @@ app.use(
     })
 );
 
-app.use(function(_req, res, next) {
-    res.setTimeout(120000, function() {
+app.use(function (_req, res, next) {
+    res.setTimeout(120000, function () {
         console.log('Request has timed out.');
         res.send(408);
     });
@@ -63,7 +63,7 @@ app.get("/", (_req, res) => {
 const Doc = db.doc;
 
 if (init) {
-    db.sequelize.sync({ force: true }).then(() => {
+    db.sequelize.sync({force: true}).then(() => {
         console.log("Drop and Resync Db");
         initial();
     });
@@ -80,7 +80,7 @@ function initial() {
         id: 1,
         name: "Health Care Directive",
         type: "Google Drive Doc",
-        link: "https://yahoo.com",
+        link: "https://drive.google.com/file/d/1jdCdPD23QS2_L9WJqUKGl9A551PfxmSS/view?usp=drive_link",
         userKey: 1
     });
 
@@ -88,14 +88,9 @@ function initial() {
         id: 2,
         name: "Last Will and Testament",
         type: "Google Drive Doc",
-        link: "https://yahoo.com",
+        link: "https://drive.google.com/file/d/1RlBpKPUWtAagUz5RjaAFmFLu6PW9F-8o/view?usp=drive_link",
         userKey: 1
     });
 }
-
-//    "name": "",
-//    "type": "",
-//    "link": "",
-//    "userKey": 7
 
 export default app;

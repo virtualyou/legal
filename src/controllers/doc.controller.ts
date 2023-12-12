@@ -16,11 +16,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
+ * doc.controller.ts
  */
 
 import db from '../models';
 import { Request, Response } from 'express';
-import logger from "../middleware/logger";
 const Doc = db.doc;
 
 class ExpressError extends Error {
@@ -35,18 +35,9 @@ const errorHandler = (err: ExpressError, _req: Request, res: Response) => {
     res.status(500).send('Internal server error');
 };
 
-/**
- * This asynchronous controller function returns a list of all Docs.
- * The function here would only be called by ROLE_ADMIN
- *
- * @param {object} _req - Callback parameter request.
- * @param {object} res - Callback parameter response.
- * @returns {Promise<void>} - To return all Doc objects
- */
-
 const getAllDocs = (_req: Request, res: Response) => {
     Doc.findAll()
-        .then((data: any) => {
+        .then((data: DocType) => {
             res.send(data);
         })
         .catch((err: ExpressError) => {
@@ -54,36 +45,15 @@ const getAllDocs = (_req: Request, res: Response) => {
         });
 };
 
-/**
- * This asynchronous controller function returns a list of
- * Docs specifically belonging to the Owner.
- *
- * The function here can be called by ROLE_OWNER, ROLE_AGENT, ROLE_MONITOR
- *
- * @param {object} req - Callback parameter request.
- * @param {object} res - Callback parameter response.
- * @returns {Promise<void>} - To return Doc objects
- */
-
-const getAllDocsForOwner = (req: any, res: Response) => {
-    logger.log('info', `We are in controller but ...req.ownerId: ` + req.ownerId);
-
-    let key = -1;
-    if (req.ownerId === 0) {
-        console.log("ownerId " + req.ownerId);
-        key = req.userId;
-    } else {
-        key = req.ownerId;
-        console.log("ownerId " + req.ownerId);
-    }
+const getAllDocsForOwner = (req: Request, res: Response) => {
 
     Doc.findAll({
             where: {
-                userKey: key,
+                userKey: getWhereKey(req),
             },
         }
     )
-        .then((data: any) => {
+        .then((data: DocType) => {
             res.send(data);
         })
         .catch((err: ExpressError) => {
@@ -91,22 +61,11 @@ const getAllDocsForOwner = (req: any, res: Response) => {
         });
 };
 
-/**
- * This controller function returns a Doc
- * based on it's primary key or id.
- *
- * The function here would ONLY be called by ROLE_ADMIN
- *
- * @param {object} req - Callback parameter request.
- * @param {object} res - Callback parameter response.
- * @returns {Promise<void>} - To return Doc object
- */
-
-const getDoc = (req: any, res: Response) => {
-    const id = req.params.id;
+const getDoc = (req: Request, res: Response) => {
+    const id = req.params['id'];
 
     Doc.findByPk(id)
-        .then((data: any) => {
+        .then((data: DocType) => {
             if (data) {
                 res.send(data);
             } else {
@@ -120,36 +79,16 @@ const getDoc = (req: any, res: Response) => {
         });
 };
 
-/**
- * This controller function returns a Doc
- * based on it's id and ONLY IF the Doc belongs to the
- * Owner.
- *
- * The function here would only be called by ROLE_ADMIN
- *
- * @param {object} req - Callback parameter request.
- * @param {object} res - Callback parameter response.
- * @returns {Promise<void>} - To return Doc object
- */
-
-const getDocForOwner = (req: any, res: Response) => {
-    const id = req.params.id;
-    let key = -1;
-    if (req.ownerId === 0) {
-        console.log("ownerId " + req.ownerId);
-        key = req.userId;
-    } else {
-        key = req.ownerId;
-        console.log("ownerId " + req.ownerId);
-    }
+const getDocForOwner = (req: Request, res: Response) => {
+    const id = req.params['id'];
 
     Doc.findOne({
         where: {
             id: id,
-            userKey: key
+            userKey: getWhereKey(req)
         }
     })
-        .then((data: any) => {
+        .then((data: DocType) => {
             if (data) {
                 res.send(data);
             } else {
@@ -163,33 +102,13 @@ const getDocForOwner = (req: any, res: Response) => {
         });
 };
 
-/**
- * This controller function creates a Doc
- *
- * The function here can be called by ROLE_OWNER and
- * ROLE_AGENT
- *
- * @param {object} req - Callback parameter request.
- * @param {object} res - Callback parameter response.
- * @returns {Promise<void>} - Promise Return
- */
-const createDocForOwner = (req: any, res: Response) => {
-    let key = -1;
+const createDocForOwner = (req: Request, res: Response) => {
     // Check request
     if (!req.body.name) {
         res.status(400).send({
             message: "Bad Request, name cannot be empty!"
         });
         return;
-    }
-
-    // Owner may be creating the Doc
-    if (req.ownerId === 0) {
-        console.log("key " + req.userId);
-        key = req.userId;
-    } else {
-        key = req.ownerId;
-        console.log("key " + req.ownerId);
     }
 
     // Create new Doc object
@@ -200,12 +119,12 @@ const createDocForOwner = (req: any, res: Response) => {
         email: req.body.email || "",
         address: req.body.address || "",
         note: req.body.note || "",
-        userKey: key
+        userKey: getWhereKey(req)
     };
 
     // Create Doc using Sequelize
     Doc.create(doc)
-        .then((data: any) => {
+        .then((data: DocType) => {
             res.status(201).send(data);
         })
         .catch((err: ExpressError) => {
@@ -213,15 +132,15 @@ const createDocForOwner = (req: any, res: Response) => {
         });
 };
 
-const updateDoc = (req: any, res: Response) => {
-    const id = req.params.id;
+const updateDoc = (req: Request, res: Response) => {
+    const id = req.params['id'];
 
     Doc.update(req.body, {
         where: {
             id: id
         }
     })
-        .then((num: any) => {
+        .then((num: number) => {
             if (num == 1) {
                 res.send({
                     message: "Doc was updated successfully!"
@@ -237,25 +156,16 @@ const updateDoc = (req: any, res: Response) => {
         });
 };
 
-const updateDocForOwner = (req: any, res: Response) => {
-    const id = req.params.id;
-    let key = -1;
-    // Owner may be creating the Doc
-    if (req.ownerId === 0) {
-        console.log("key " + req.userId);
-        key = req.userId;
-    } else {
-        key = req.ownerId;
-        console.log("key " + req.ownerId);
-    }
+const updateDocForOwner = (req: Request, res: Response) => {
+    const id = req.params['id'];
 
     Doc.update(req.body, {
         where: {
             id: id,
-            userKey: key
+            userKey: getWhereKey(req)
         }
     })
-        .then((num: any) => {
+        .then((num: number) => {
             if (num == 1) {
                 res.send({
                     message: "Doc was updated successfully!"
@@ -271,21 +181,9 @@ const updateDocForOwner = (req: any, res: Response) => {
         });
 };
 
-
-/**
- * This asynchronous controller function deletes a Doc
- * based on it's primary key or id.
- *
- * The function here would ONLY be called by ROLE_ADMIN
- *
- * @param {object} req - Callback parameter request.
- * @param {object} res - Callback parameter response.
- * @returns {Promise<void>} - Return Promise
- */
-
-const deleteDoc = (req: any, res: Response) => {
+const deleteDoc = (req: Request, res: Response) => {
     // url parameter
-    const id = req.params.id;
+    const id = req.params['id'];
 
     // delete specific record
     Doc.destroy({
@@ -293,7 +191,7 @@ const deleteDoc = (req: any, res: Response) => {
             id: id
         }
     })
-        .then((num: any) => {
+        .then((num: number) => {
             if (num == 1) {
                 return res.status(200).send({
                     message: "Doc was deleted!"
@@ -309,40 +207,17 @@ const deleteDoc = (req: any, res: Response) => {
         });
 }
 
-/**
- * This asynchronous controller function deletes a Doc
- * based on it's id and ONLY if it belongs to the
- * Owner.
- *
- * The function here can be called by ROLE_OWNER and
- * ROLE_AGENT.
- *
- * @param {object} req - Callback parameter request.
- * @param {object} res - Callback parameter response.
- * @returns {Promise<void>} - Return Promise
- */
-
-const deleteDocForOwner = (req: any, res: Response) => {
+const deleteDocForOwner = (req: Request, res: Response) => {
     // url parameter
-    const id = req.params.id;
-    let key = -1;
-
-    // if ownerId = 0 then user is owner
-    if (req.ownerId === 0) {
-        console.log("key " + req.userId);
-        key = req.userId;
-    } else {
-        key = req.ownerId;
-        console.log("key " + req.ownerId);
-    }
+    const id = req.params['id'];
 
     // delete specific record
     Doc.destroy({
         where: {
             id: id,
-            userKey: key
+            userKey: getWhereKey(req)
         }
-    }).then((num: any) => {
+    }).then((num: number) => {
         if (num == 1) {
             return res.status(200).send({
                 message: "Doc was deleted!"
@@ -358,24 +233,13 @@ const deleteDocForOwner = (req: any, res: Response) => {
         });
 }
 
-/**
- * This asynchronous controller function deletes all
- * Docs.
- *
- * The function here would ONLY be called by ROLE_ADMIN
- *
- * @param {object} _req - Callback parameter request.
- * @param {object} res - Callback parameter response.
- * @returns {Promise<void>} - Return Promise
- */
-
 const deleteAllDocs = (_req: Request, res: Response) => {
 
     Doc.destroy({
         where: {},
         truncate: false
     })
-        .then((nums: any) => {
+        .then((nums: number) => {
             res.status(200).send({ message: `${nums} Docs were deleted successfully!` });
         })
         .catch((err: ExpressError) => {
@@ -383,21 +247,21 @@ const deleteAllDocs = (_req: Request, res: Response) => {
         });
 }
 
-/**
- * This asynchronous controller function deletes all
- * Docs for the session Owner.
- *
- * The function here can be called by ROLE_OWNER and
- * ROLE_AGENT.
- *
- * @param {object} req - Callback parameter request.
- * @param {object} res - Callback parameter response.
- * @returns {Promise<void>} - Return Promise
- */
+const deleteAllDocsForOwner = (req: Request, res: Response) => {
+    Doc.destroy({
+        where: {userKey: getWhereKey(req)},
+        truncate: false
+    })
+        .then((nums: number) => {
+            res.status(200).send({ message: `${nums} Docs were deleted successfully!` });
+        })
+        .catch((err: ExpressError) => {
+            errorHandler(err, req, res);
+        });
+}
 
-const deleteAllDocsForOwner = (req: any, res: Response) => {
-    let key = -1;
-    // if ownerId = 0 then user is owner
+const getWhereKey = (req: Request) => {
+    let key: number;
     if (req.ownerId === 0) {
         console.log("key " + req.userId);
         key = req.userId;
@@ -405,17 +269,7 @@ const deleteAllDocsForOwner = (req: any, res: Response) => {
         key = req.ownerId;
         console.log("key " + req.ownerId);
     }
-
-    Doc.destroy({
-        where: {userKey: key},
-        truncate: false
-    })
-        .then((nums: any) => {
-            res.status(200).send({ message: `${nums} Docs were deleted successfully!` });
-        })
-        .catch((err: ExpressError) => {
-            errorHandler(err, req, res);
-        });
+    return key;
 }
 
 const docController = {
@@ -430,7 +284,6 @@ const docController = {
     deleteDocForOwner,
     deleteAllDocs,
     deleteAllDocsForOwner
-    
 };
 export default docController;
 
