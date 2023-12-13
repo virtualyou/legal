@@ -18,6 +18,7 @@
  * doc.model.ts
  */
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const doc = (sequelize: any, Sequelize: any) => {
     return sequelize.define("docs", {
         name: {

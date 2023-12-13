@@ -21,16 +21,13 @@
 
 import jwt from 'jsonwebtoken';
 import cookieConfig from '../config/auth.config';
-import logger from "../middleware/logger";
 import { Request, Response, NextFunction } from "express";
 
 const USERAUTH_SERVER_PORT_URL = process.env['USERAUTH_SERVER_PORT_URL'];
 
 const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-  logger.log('info', 'checking for a token');
 
-  // @ts-ignore
-  let token = req.session.token;
+  const token = req.session.token;
 
   if (!token) {
     console.log("no token?");
@@ -39,10 +36,9 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
     });
   }
 
-  logger.log('info', 'we have a token');
-
   jwt.verify(token,
       cookieConfig.secret,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (err: any, decoded: any) => {
         if (err) {
           console.log("JWT did not verify!");
@@ -50,15 +46,9 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
             message: "Unauthorized!",
           });
         }
-        // @ts-ignore
         req.userId = decoded.id;
-        // @ts-ignore
         req.ownerId = decoded.owner;
-        // @ts-ignore
-        logger.log('info', 'the owner id is: ' + req.ownerId);
-        logger.log('info', 'The JWT token has been verified. We have authentication.');
-        //console.log("The owner id is: " + req.ownerId);
-        //console.log("The JWT token has been verified. We have authentication.");
+
         next();
       });
 };
@@ -204,7 +194,8 @@ const isMonitor = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 // Fetch all User Roles (Private)
-async function fetchData(id: any, cookie: any) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function fetchData(id: number, cookie: any) {
   try {
     const response = await fetch(USERAUTH_SERVER_PORT_URL + '/userauth/v1/users/' + id + '/roles', {
       headers: {
