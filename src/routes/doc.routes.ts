@@ -93,7 +93,7 @@ docRouter.get(
     docController.getDocForOwner
 );
 
-// POST - create a new Peep for owner (owner or agent cognizant of userKey)
+// POST - create a new Document for owner (owner or agent cognizant of userKey)
 docRouter.post(
     "/legal/v1/owner/docs",
     [authJwt.verifyToken, authJwt.isOwnerOrAgent],

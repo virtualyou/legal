@@ -114,11 +114,8 @@ const createDocForOwner = (req: Request, res: Response) => {
     // Create new Doc object
     const doc = {
         name: req.body.name,
-        phone1: req.body.phone1 || "",
-        phone2: req.body.phone2 || "",
-        email: req.body.email || "",
-        address: req.body.address || "",
-        note: req.body.note || "",
+        type: req.body.type || "",
+        link: req.body.link || "",
         userKey: getWhereKey(req)
     };
 
